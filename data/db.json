@@ -1,0 +1,83 @@
+{
+  "invitations": {
+    "0c36cffc-cea0-40e2-9589-46cd052d3996": {
+      "id": "0c36cffc-cea0-40e2-9589-46cd052d3996",
+      "creatorChatId": "6555016165",
+      "targetName": "Дара",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "На шаурму",
+        "Прогулка по 8 причалу"
+      ],
+      "status": "accepted",
+      "acceptedDetails": {
+        "activity": "Посидим во дворе",
+        "date": "2026-06-22",
+        "time": "14:32",
+        "message": "хуй"
+      }
+    },
+    "e9d78e0d-d173-442b-9d92-f3c34864acaf": {
+      "id": "e9d78e0d-d173-442b-9d92-f3c34864acaf",
+      "creatorChatId": "6555016165",
+      "targetName": "Дара",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "На шаурму",
+        "Прогулка по 8 причалу"
+      ],
+      "status": "pending",
+      "acceptedDetails": null
+    },
+    "3ae0dd3b-b493-47c2-9a12-19f076628bd9": {
+      "id": "3ae0dd3b-b493-47c2-9a12-19f076628bd9",
+      "creatorChatId": "6555016165",
+      "targetName": "Дара",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "На шаурму",
+        "Прогулка по 8 причалу"
+      ],
+      "status": "pending",
+      "acceptedDetails": null,
+      "customTitle": "я приглашаю тебя прогуляться",
+      "allowDateTimeSelection": true
+    },
+    "2fb9223e-8ea2-471b-aadc-0164a2ba4dcc": {
+      "id": "2fb9223e-8ea2-471b-aadc-0164a2ba4dcc",
+      "creatorChatId": "6555016165",
+      "targetName": "Дара",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "На шаурму",
+        "Прогулка по 8 причалу"
+      ],
+      "status": "pending",
+      "acceptedDetails": null,
+      "customTitle": "я приглашаю тебя прогуляться",
+      "allowDateTimeSelection": false
+    },
+    "cec5d798-63ed-45a6-8194-8a07e612eea5": {
+      "id": "cec5d798-63ed-45a6-8194-8a07e612eea5",
+      "creatorChatId": "6555016165",
+      "targetName": "Дарина",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "На шаурму",
+        "Прогулка по 8 причалу"
+      ],
+      "status": "accepted",
+      "acceptedDetails": {
+        "activity": "Посидим во дворе",
+        "date": "",
+        "time": "14:05",
+        "message": "ыв"
+      }
+    }
+  }
+}

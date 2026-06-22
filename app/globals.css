@@ -10,17 +10,143 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair);
+  --font-handwritten: var(--font-caveat);
+  --font-montserrat: var(--font-montserrat);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0d090b;
+    --foreground: #fcf8fa;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
 }
+
+/* Custom Keyframe Animations */
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes float1 {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) translateX(15px) rotate(8deg);
+  }
+}
+
+@keyframes float2 {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(25px) translateX(-20px) rotate(-12deg);
+  }
+}
+
+@keyframes float3 {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) translateX(-15px) scale(1.05);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ribbonFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+/* Animation Utility Classes */
+.animate-heartbeat {
+  animation: heartbeat 1.6s infinite ease-in-out;
+}
+
+.animate-float-1 {
+  animation: float1 8s infinite ease-in-out;
+}
+
+.animate-float-2 {
+  animation: float2 10s infinite ease-in-out;
+}
+
+.animate-float-3 {
+  animation: float3 12s infinite ease-in-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 6s infinite ease-in-out;
+}
+
+.animate-ribbon {
+  animation: ribbonFloat 4s infinite ease-in-out;
+}
+
+/* Glassmorphism custom blur borders */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(244, 63, 94, 0.15);
+}
+
+.dark .glass-panel {
+  background: rgba(26, 12, 18, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(244, 63, 94, 0.25);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass-card {
+  background: rgba(20, 10, 15, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
