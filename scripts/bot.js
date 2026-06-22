@@ -30,7 +30,7 @@ function loadEnv() {
 loadEnv();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const baseUrl = "https://my-invite-app.vercel.app";
 
 if (!token) {
   console.error("\n❌ ОШИБКА: TELEGRAM_BOT_TOKEN не задан!");
