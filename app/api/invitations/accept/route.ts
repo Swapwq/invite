@@ -8,7 +8,7 @@ import { readDb } from "@/lib/db";
  */
 export async function POST(request: Request) {
   try {
-    const { id, creatorChatId, activity, date, time, message } = await request.json();
+    const { id, creatorChatId, activity, date, time, message, notifyChatId } = await request.json();
 
     const invitations = await readDb();
     let invitation: any = undefined;
@@ -37,6 +37,8 @@ export async function POST(request: Request) {
 
     // Send Telegram notification if token present
     const token = process.env.TELEGRAM_BOT_TOKEN;
+    // Determine which chat should receive the notification
+    const targetChatId = notifyChatId || invitation.creatorChatId;
     if (token) {
       const formattedDate = new Date(date).toLocaleDateString("ru-RU", {
         day: "numeric",
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            chat_id: invitation.creatorChatId,
+            chat_id: targetChatId,
             text: messageText,
             parse_mode: "HTML",
           }),
