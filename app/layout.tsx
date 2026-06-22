@@ -31,8 +31,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Приглашение для Даруси 💖",
-  description: "Особенное приглашение на свидание",
+  title: "Приглашение для Дарины",
+  description: "Особенное приглашение",
+  colorScheme: 'light',
 };
 
 export default function RootLayout({
