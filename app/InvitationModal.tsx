@@ -30,7 +30,7 @@ export default function InvitationModal({
   targetName = "Дарина",
   customTitle,
   customDescription,
-  customActivities = ["Кофе и десерт", "Ужин в ресторане", "Прогулка под луной", "Вечер-сюрприз"],
+  customActivities = ["Посидим во дворе", "Прогулка по соборной", "Прогулка по намыву", "Поедем на шаурму"],
   allowDateSelection = true,
   allowTimeSelection = true,
 }: InvitationModalProps) {

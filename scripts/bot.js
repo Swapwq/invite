@@ -30,7 +30,7 @@ function loadEnv() {
 loadEnv();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const baseUrl = "https://my-invite-app.vercel.app";
+const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://www.sinowaycargo.com";
 
 if (!token) {
   console.error("\n❌ ОШИБКА: TELEGRAM_BOT_TOKEN не задан!");

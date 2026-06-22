@@ -17,7 +17,9 @@ export async function POST(
       return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
-    // Update status and details
+    // In production (read‑only FS) we cannot persist the acceptance. The invitation is updated in memory and the telegram notification is sent.
+    // If persistence is required, migrate to a DB or Vercel KV.
+
     invitation.status = "accepted";
     invitation.acceptedDetails = {
       activity: String(activity),
@@ -25,8 +27,6 @@ export async function POST(
       time: String(time),
       message: String(message || "").trim(),
     };
-
-    await writeDb(invitations);
 
     // Send Telegram Notification if token is available
     const token = process.env.TELEGRAM_BOT_TOKEN;
