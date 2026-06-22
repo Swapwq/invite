@@ -137,10 +137,8 @@ export default function InvitationModal({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (id && id !== "default") {
-      try {
-        await fetch(`/api/invitations/${id}/accept`, {
+    try {
+        await fetch(`/api/invitations/accept`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -153,7 +151,6 @@ export default function InvitationModal({
       } catch (err) {
         console.error("Error submitting acceptance form:", err);
       }
-    }
     
     setSubmitted(true);
   };

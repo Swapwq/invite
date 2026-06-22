@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
-import { readDb, writeDb } from "@/lib/db";
+import { readDb } from "@/lib/db";
 
+/**
+ * POST /api/invitations/accept
+ * Accepts an invitation either by explicit `id` (if provided) or by the `creatorChatId`
+ * that created the pending invitation. No persistent DB write – Vercel's filesystem is read‑only.
+ */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { id, creatorChatId, activity, date, time, message } = body;
+    const { id, creatorChatId, activity, date, time, message } = await request.json();
 
     const invitations = await readDb();
-
-    // Find invitation either by explicit id or by creatorChatId (first pending)
     let invitation: any = undefined;
+
     if (id) {
       invitation = invitations[id];
     } else if (creatorChatId) {
+      // Find first pending invitation created by this chat ID
       invitation = Object.values(invitations).find(
         (inv: any) => inv.creatorChatId === String(creatorChatId) && inv.status === "pending"
       );
@@ -22,9 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
-    // In production (read‑only FS) we cannot persist the acceptance. The invitation is updated in memory and the telegram notification is sent.
-    // If persistence is required, migrate to a DB or Vercel KV.
-
+    // Update status in‑memory (no persistent write on Vercel)
     invitation.status = "accepted";
     invitation.acceptedDetails = {
       activity: String(activity),
@@ -33,9 +35,7 @@ export async function POST(request: Request) {
       message: String(message || "").trim(),
     };
 
-    // No writeDb call – read‑only file system on Vercel.
-
-    // Send Telegram Notification if token is available
+    // Send Telegram notification if token present
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (token) {
       const formattedDate = new Date(date).toLocaleDateString("ru-RU", {
@@ -44,12 +44,11 @@ export async function POST(request: Request) {
         year: "numeric",
       });
 
-      // Map activity ID to human readable name
       const activityLabels: Record<string, string> = {
         cafe: "Кофе и десерт ☕",
         dinner: "Ужин в ресторане 🍷",
         walk: "Прогулка под луной 🌙",
-        surprise: "Вечер-сюрприз 🎁",
+        surprise: "Вечер‑сюрприз 🎁",
       };
       const activityText = activityLabels[activity] || activity;
 
@@ -59,10 +58,8 @@ export async function POST(request: Request) {
         `⏰ <b>Время:</b> ${time}\n` +
         (message ? `💬 <b>Пожелания:</b> <i>"${message}"</i>\n` : "");
 
-      const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
       try {
-        const response = await fetch(url, {
+        const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -71,22 +68,18 @@ export async function POST(request: Request) {
             parse_mode: "HTML",
           }),
         });
-
-        if (!response.ok) {
-          console.error("Telegram API response was not OK", await response.text());
+        if (!resp.ok) {
+          console.error("Telegram API error", await resp.text());
         }
-      } catch (err) {
-        console.error("Failed to send Telegram notification:", err);
+      } catch (e) {
+        console.error("Failed to send Telegram notification", e);
       }
     } else {
-      console.warn("TELEGRAM_BOT_TOKEN is not set in environment variables.");
+      console.warn("TELEGRAM_BOT_TOKEN not set – notification not sent");
     }
 
     return NextResponse.json({ success: true, invitation });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to accept invitation", details: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to accept invitation", details: error.message }, { status: 500 });
   }
 }
