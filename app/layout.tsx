@@ -44,6 +44,7 @@ export default function RootLayout({
     <html
       lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${caveat.variable} ${montserrat.variable} h-full antialiased`}
+      style={{ colorScheme: 'light' }}
     >
       <body className="min-h-full flex flex-col" style={{ colorScheme: 'light' }}>{children}</body>
     </html>
