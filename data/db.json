@@ -78,6 +78,38 @@
         "time": "14:05",
         "message": "ыв"
       }
+    },
+    "1d2fbaa9-5143-4569-a5c0-97cc15f9ce4a": {
+      "id": "1d2fbaa9-5143-4569-a5c0-97cc15f9ce4a",
+      "creatorChatId": "6555016165",
+      "targetName": "Дарина",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "Поедем на шаурму",
+        "Прогулка по Намыву"
+      ],
+      "status": "pending",
+      "acceptedDetails": null,
+      "allowDateSelection": false,
+      "allowTimeSelection": true,
+      "customTitle": "по мулочанию",
+      "fixedDate": "2026-06-23"
+    },
+    "a663bd8f-f681-4f78-b3b8-c6f92bf5a641": {
+      "id": "a663bd8f-f681-4f78-b3b8-c6f92bf5a641",
+      "creatorChatId": "6555016165",
+      "targetName": "Дарина",
+      "activities": [
+        "Посидим во дворе",
+        "Прогулка по соборной",
+        "Поедем на шаурму",
+        "Прогулка по Намыву"
+      ],
+      "status": "pending",
+      "acceptedDetails": null,
+      "allowDateSelection": true,
+      "allowTimeSelection": true
     }
   }
 }

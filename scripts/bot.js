@@ -30,7 +30,8 @@ function loadEnv() {
 loadEnv();
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://www.sinowaycargo.com";
+const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const baseUrl = /^https?:\/\//.test(rawBaseUrl) ? rawBaseUrl : `https://${rawBaseUrl}`;
 
 if (!token) {
   console.error("\n❌ ОШИБКА: TELEGRAM_BOT_TOKEN не задан!");
@@ -79,7 +80,7 @@ async function handleMessage(message) {
     sessions[chatId] = { step: "name" };
     await sendMessage(
       chatId,
-      "Привет! Я помогу тебе создать красивое интерактивное приглашение на свидание. 💖\n\n" +
+      "Привет! Я помогу создать кастомное интерактивное приглашение на свидание. 💖\n\n" +
         "Напиши <b>имя получателя приглашения</b> (например: <i>Даруся</i>):"
     );
     return;
@@ -102,7 +103,7 @@ async function handleMessage(message) {
     await sendMessage(
       chatId,
       `Принято: <b>${text}</b>\n\n` +
-        "Теперь давай определимся с занятиями. Напиши <b>4 варианта занятий через запятую</b>.\n" +
+        "Теперь давай определимся с вариантами свидания. Напиши варианты через запятую.\n" +
         "<i>Пример: Ужин в ресторане, Прогулка под луной, Кофе и десерт, Вечер-сюрприз</i>\n\n" +
         'Или напиши слово <b>"стандартные"</b>, чтобы использовать стандартный набор вариантов.'
     );
@@ -123,28 +124,73 @@ async function handleMessage(message) {
     }
     session.activities = activities;
     session.step = "customTitle";
-    await sendMessage(chatId, "Введите заголовок приглашения (или напишите 'по умолчанию'):");
+    await sendMessage(chatId, "Введи заголовок приглашения (или напиши 'по умолчанию'):");
     return;
   }
 
   if (session.step === "customTitle") {
     session.customTitle = text.toLowerCase() === "по умолчанию" ? undefined : text;
     session.step = "customDescription";
-    await sendMessage(chatId, "Введите описание приглашения (или напишите 'по умолчанию'):");
+    await sendMessage(chatId, "Введи короткое описание/послание (или напиши 'по умолчанию'):");
     return;
   }
 
   if (session.step === "customDescription") {
     session.customDescription = text.toLowerCase() === "по умолчанию" ? undefined : text;
-    session.step = "allowDateTime";
-    await sendMessage(chatId, "Разрешить получателю выбрать дату и время? (да/нет):");
+    session.step = "allowDate";
+    await sendMessage(chatId, "Разрешить получателю выбрать дату? (да/нет):");
     return;
   }
 
-  if (session.step === "allowDateTime") {
+  if (session.step === "allowDate") {
     const yes = ["да", "yes", "y"];
-    session.allowDateTimeSelection = yes.includes(text.toLowerCase());
-    // Create invitation
+    session.allowDateSelection = yes.includes(text.toLowerCase());
+    if (session.allowDateSelection) {
+      session.step = "allowTime";
+      await sendMessage(chatId, "Разрешить получателю выбрать время? (да/нет):");
+    } else {
+      session.step = "fixedDate";
+      await sendMessage(chatId, "Введи дату свидания в формате ГГГГ-ММ-ДД:");
+    }
+    return;
+  }
+
+  if (session.step === "fixedDate") {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      await sendMessage(chatId, "Нужен формат ГГГГ-ММ-ДД, например 2026-06-25:");
+      return;
+    }
+    session.fixedDate = text;
+    session.step = "allowTime";
+    await sendMessage(chatId, "Разрешить получателю выбрать время? (да/нет):");
+    return;
+  }
+
+  if (session.step === "allowTime") {
+    const yes = ["да", "yes", "y"];
+    session.allowTimeSelection = yes.includes(text.toLowerCase());
+    if (session.allowTimeSelection) {
+      await createInvitation(chatId, session);
+    } else {
+      session.step = "fixedTime";
+      await sendMessage(chatId, "Введи время свидания в формате ЧЧ:ММ:");
+    }
+    return;
+  }
+
+  if (session.step === "fixedTime") {
+    if (!/^\d{2}:\d{2}$/.test(text)) {
+      await sendMessage(chatId, "Нужен формат ЧЧ:ММ, например 19:30:");
+      return;
+    }
+    session.fixedTime = text;
+    await createInvitation(chatId, session);
+    return;
+  }
+}
+
+async function createInvitation(chatId, session) {
+  // Create invitation
     await sendMessage(chatId, "⏳ Создаю приглашение, секунду...");
     try {
       const response = await fetch(`${baseUrl}/api/invitations`, {
@@ -156,7 +202,10 @@ async function handleMessage(message) {
           activities: session.activities,
           ...(session.customTitle && { customTitle: session.customTitle }),
           ...(session.customDescription && { customDescription: session.customDescription }),
-          ...(session.allowDateTimeSelection !== undefined && { allowDateTimeSelection: session.allowDateTimeSelection })
+          allowDateSelection: session.allowDateSelection,
+          allowTimeSelection: session.allowTimeSelection,
+          ...(session.fixedDate && { fixedDate: session.fixedDate }),
+          ...(session.fixedTime && { fixedTime: session.fixedTime })
         })
       });
       if (!response.ok) {
@@ -175,8 +224,6 @@ async function handleMessage(message) {
         "❌ Не удалось подключиться к серверу сайта.\n\nУбедись, что твой Next.js сервер запущен локально (выполнена команда <code>npm run dev</code>)."
       );
     }
-    return;
-  }
 }
 
 

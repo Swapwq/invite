@@ -17,6 +17,8 @@ export interface Invitation {
   customDescription?: string; // Full invitation description text
   allowDateSelection?: boolean; // If true, invitee can select a date
   allowTimeSelection?: boolean; // If true, invitee can select a time
+  fixedDate?: string;
+  fixedTime?: string;
 }
 
 
@@ -27,7 +29,7 @@ export async function readDb(): Promise<Record<string, Invitation>> {
     const data = await fs.readFile(DB_PATH, "utf-8");
     const parsed = JSON.parse(data);
     return parsed.invitations || {};
-  } catch (error) {
+  } catch {
     // Return empty if file not found or corrupted
     return {};
   }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display, Caveat, Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -33,7 +33,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Приглашение для Дарины",
   description: "Особенное приглашение",
-  colorScheme: 'light',
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -51,4 +54,3 @@ export default function RootLayout({
     </html>
   );
 }
-

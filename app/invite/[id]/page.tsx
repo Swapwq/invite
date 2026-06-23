@@ -18,9 +18,14 @@ export default async function InvitePage({ params }: PageProps) {
   return (
     <InvitationModal
       id={invitation.id}
+      targetName={invitation.targetName}
+      customTitle={invitation.customTitle}
+      customDescription={invitation.customDescription}
       allowDateSelection={invitation.allowDateSelection}
       allowTimeSelection={invitation.allowTimeSelection}
       customActivities={invitation.activities}
+      fixedDate={invitation.fixedDate}
+      fixedTime={invitation.fixedTime}
     />
   );
 }

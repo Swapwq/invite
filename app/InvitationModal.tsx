@@ -23,6 +23,8 @@ interface InvitationModalProps {
   customActivities?: string[];
   allowDateSelection?: boolean;
   allowTimeSelection?: boolean;
+  fixedDate?: string;
+  fixedTime?: string;
 }
 
 export default function InvitationModal({
@@ -33,6 +35,8 @@ export default function InvitationModal({
   customActivities = ["Посидим во дворе", "Прогулка по соборной", "Прогулка по намыву", "Поедем на шаурму"],
   allowDateSelection = true,
   allowTimeSelection = true,
+  fixedDate = "",
+  fixedTime = "",
 }: InvitationModalProps) {
   const [accepted, setAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -43,9 +47,9 @@ export default function InvitationModal({
   const [showDeclineHint, setShowDeclineHint] = useState("");
   
   // Date preferences state
-  const [selectedActivity, setSelectedActivity] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [selectedActivity, setSelectedActivity] = useState(customActivities[0] || "");
+  const [date, setDate] = useState(fixedDate);
+  const [time, setTime] = useState(fixedTime);
   const [message, setMessage] = useState("");
   
   // Audio state
@@ -57,13 +61,6 @@ export default function InvitationModal({
 
   // Ref to prevent hover/touch trigger loop during transitions
   const lastEscapeTime = useRef(0);
-
-  // Initialize selected activity
-  useEffect(() => {
-    if (customActivities && customActivities.length > 0) {
-      setSelectedActivity(customActivities[0]);
-    }
-  }, [customActivities]);
 
   // Escaping Decline Button Logic
   const handleDeclineInteract = (e: React.MouseEvent | React.TouchEvent) => {
@@ -127,7 +124,7 @@ export default function InvitationModal({
       audioRef.current.play().catch(() => {});
       setMusicPlaying(true);
     } else if (!audioRef.current) {
-      audioRef.current = new Audio("/music.mp3?v=2");
+      audioRef.current = new Audio("/norm.mp3");
       audioRef.current.loop = true;
       audioRef.current.volume = 0.2;
       audioRef.current.play().catch(() => {});
@@ -142,6 +139,7 @@ export default function InvitationModal({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            id,
             activity: selectedActivity,
             date,
             time,
@@ -160,28 +158,28 @@ export default function InvitationModal({
     const lowercase = label.toLowerCase();
     if (lowercase.includes("кофе") || lowercase.includes("чай") || lowercase.includes("кафе") || lowercase.includes("десерт") || lowercase.includes("сладкое")) {
       return (
-        <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 8H21a2 2 0 012 2v3a2 2 0 01-2 2h-2.5M3 8h15.5a.5.5 0 01.5.5v10a3 3 0 01-3 3H6a3 3 0 01-3-3V8.5a.5.5 0 01.5-.5zM6 3v2M10 3v2M14 3v2" />
         </svg>
       );
     }
     if (lowercase.includes("ужин") || lowercase.includes("ресторан") || lowercase.includes("еда") || lowercase.includes("вино") || lowercase.includes("кушать") || lowercase.includes("пицца") || lowercase.includes("суши")) {
       return (
-        <svg className="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4V3H8v5c0 2.21 1.79 4 4 4zM12 12v9M8 21h8M5 3v5c0 1.5 1 2.5 2 3M19 3v5c0 1.5-1 2.5-2 3" />
         </svg>
       );
     }
     if (lowercase.includes("прогулка") || lowercase.includes("гулять") || lowercase.includes("луна") || lowercase.includes("парк") || lowercase.includes("звезд") || lowercase.includes("пешком")) {
       return (
-        <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       );
     }
     if (lowercase.includes("сюрприз") || lowercase.includes("подарок") || lowercase.includes("вечер") || lowercase.includes("кино") || lowercase.includes("квест") || lowercase.includes("игра")) {
       return (
-        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm-9 4h18M4 10h16v11H4V10z" />
         </svg>
       );
@@ -203,7 +201,7 @@ export default function InvitationModal({
     if (!ctx) return;
 
     let animationFrameId: number;
-    let particles: Particle[] = [];
+    const particles: Particle[] = [];
     
     // Set canvas sizes
     const resizeCanvas = () => {
@@ -245,7 +243,7 @@ export default function InvitationModal({
       const side = Math.random() < 0.5 ? "left" : "right";
       
       let x = 0;
-      let y = canvas.height * 0.85; // spawn slightly above bottom edge
+      const y = canvas.height * 0.85; // spawn slightly above bottom edge
       let speedX = 0;
       let speedY = 0;
       
@@ -350,18 +348,18 @@ export default function InvitationModal({
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-rose-50 via-white to-pink-100 dark:from-[#1c0d12] dark:via-[#0c0608] dark:to-[#1a0a10] px-4 py-8">
+    <div className="relative min-h-dvh w-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-rose-50 via-white to-pink-100 px-3 py-4 sm:px-4 sm:py-8">
       {/* Background Animated Gradient Blobs */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {/* Soft pink bubble top left */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-pink-300/40 to-rose-400/10 blur-[100px] animate-float-1 dark:from-pink-900/30 dark:to-rose-800/5"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] sm:w-[50vw] sm:h-[50vw] rounded-full bg-gradient-to-br from-pink-300/40 to-rose-400/10 blur-[90px] sm:blur-[100px] animate-float-1"></div>
         {/* Soft peach bubble bottom right */}
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-rose-200/40 to-amber-200/20 blur-[120px] animate-float-2 dark:from-rose-950/20 dark:to-amber-950/5"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[80vw] h-[80vw] sm:w-[60vw] sm:h-[60vw] rounded-full bg-gradient-to-tr from-rose-200/40 to-amber-200/20 blur-[95px] sm:blur-[120px] animate-float-2"></div>
         {/* White glowing bubble center */}
-        <div className="absolute top-[30%] left-[25%] w-[45vw] h-[45vw] rounded-full bg-white/30 blur-[80px] animate-float-3 dark:bg-pink-950/10"></div>
+        <div className="absolute top-[30%] left-[25%] w-[55vw] h-[55vw] sm:w-[45vw] sm:h-[45vw] rounded-full bg-white/35 blur-[70px] sm:blur-[80px] animate-float-3"></div>
         {/* Sparkle background details */}
-        <div className="absolute top-[15%] right-[20%] text-rose-300/40 dark:text-rose-500/20 text-4xl animate-pulse-glow">✦</div>
-        <div className="absolute bottom-[20%] left-[15%] text-pink-300/50 dark:text-pink-500/20 text-3xl animate-pulse-glow" style={{ animationDelay: "2s" }}>✦</div>
+        <div className="absolute top-[15%] right-[20%] text-rose-300/40 text-4xl animate-pulse-glow">✦</div>
+        <div className="absolute bottom-[20%] left-[15%] text-pink-300/50 text-3xl animate-pulse-glow" style={{ animationDelay: "2s" }}>✦</div>
       </div>
 
       {/* Background celebration canvas when accepted */}
@@ -373,20 +371,20 @@ export default function InvitationModal({
       )}
 
       {/* Glassmorphic Container Card (Removed overflow-hidden to let runaway button slide outside card bounds) */}
-      <div className="w-full max-w-lg z-20 glass-panel rounded-3xl p-8 sm:p-10 shadow-2xl transition-all duration-700 transform scale-100 hover:shadow-pink-200/30 dark:hover:shadow-pink-950/10 relative">
+      <div className="w-full max-w-lg z-20 glass-panel rounded-[1.75rem] sm:rounded-3xl p-5 sm:p-10 shadow-2xl transition-all duration-700 transform scale-100 hover:shadow-pink-200/30 relative max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain">
         
         {/* Cute Sound Toggle Button (using clean SVGs instead of emojis) */}
         <button
           onClick={toggleMusic}
-          className="absolute top-4 right-4 p-2.5 rounded-full bg-white/40 dark:bg-white/5 border border-white/20 hover:bg-white/60 dark:hover:bg-white/10 transition-colors"
+          className="absolute top-4 right-4 p-2.5 rounded-full bg-white/55 border border-white/40 hover:bg-white/75 transition-colors"
           title={musicPlaying ? "Выключить музыку" : "Включить музыку"}
         >
           {musicPlaying ? (
-            <svg className="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
             </svg>
@@ -409,22 +407,22 @@ export default function InvitationModal({
             </div>
 
             {/* Letter Subtitle */}
-            <span className="text-xs tracking-[0.2em] uppercase font-semibold text-rose-500/80 dark:text-rose-400 mb-2 font-montserrat">
-              Личное послание
+            <span className="text-xs tracking-[0.2em] uppercase font-semibold text-rose-500/80 mb-2 font-montserrat">
+              Персональное приглашение
             </span>
 
             {/* Title Section */}
           {customTitle ? (
-            <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 dark:text-pink-50 leading-tight mb-4 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 leading-tight mb-4 tracking-tight">
               {customTitle}
             </h1>
           ) : (
-            <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 dark:text-pink-50 leading-tight mb-4 tracking-tight">
-              {targetName}, я приглашаю тебя на прогулку
+            <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 leading-tight mb-4 tracking-tight">
+              {targetName}, пойдём на свидание?
             </h1>
           )}
           {customDescription && (
-            <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-300 font-montserrat font-light leading-relaxed max-w-xs mb-8">
+            <p className="text-sm sm:text-base text-zinc-600 font-montserrat font-light leading-relaxed max-w-xs mb-8">
               {customDescription}
             </p>
           )}
@@ -432,14 +430,14 @@ export default function InvitationModal({
             {/* Hint message above decline button (Removed overflow-hidden to prevent cutting slanted letters during bounce) */}
             <div className="h-7 mb-2 transition-all duration-300">
               {showDeclineHint && (
-                <span className="text-xs text-rose-500/90 dark:text-rose-400 font-handwritten text-lg tracking-wide animate-bounce inline-block px-2">
+                <span className="text-xs text-rose-500/90 font-handwritten text-lg tracking-wide animate-bounce inline-block px-2">
                   {showDeclineHint}
                 </span>
               )}
             </div>
 
             {/* Two Action Buttons */}
-            <div className="w-full flex flex-col sm:flex-row gap-4 justify-center items-center mt-2 relative min-h-[140px] sm:min-h-0 sm:h-20">
+            <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mt-2 relative min-h-[128px] sm:min-h-0 sm:h-20">
               
               {/* Accept Button */}
               <button
@@ -461,7 +459,7 @@ export default function InvitationModal({
                   transform: `translate(${declinePosition.x}px, ${declinePosition.y}px)`,
                   transition: "transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
                 }}
-                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-medium border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 transition-all duration-300 text-base z-20 relative ${
+                className={`w-full sm:w-auto px-8 py-3.5 rounded-full font-medium border border-zinc-300 hover:bg-zinc-50 text-zinc-600 transition-all duration-300 text-base z-20 relative ${
                   declineAttempts >= 6 ? "scale-90 opacity-80" : ""
                 }`}
               >
@@ -476,40 +474,41 @@ export default function InvitationModal({
             {!submitted ? (
               <form onSubmit={handleFormSubmit} className="flex flex-col items-center">
                 {/* Visual success top (Checkmark badge instead of emojis) */}
-                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
                   <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl font-serif text-zinc-900 dark:text-pink-50 mb-2 leading-snug">
-                  Ура! Прогулке быть!
+                <h2 className="text-2xl sm:text-3xl font-serif text-zinc-900 mb-2 leading-snug">
+                  Ура, свиданию быть!
                 </h2>
                 
-                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-montserrat mb-6">
-                  Давай запланируем нашу прогулку. Выбери свои предпочтения:
+                <p className="text-xs sm:text-sm text-zinc-500 font-montserrat mb-5 sm:mb-6">
+                  Осталось выбрать некоторые детали для нашей встречи.
                 </p>
 
                 <div className="w-full flex flex-col gap-5 text-left mb-6">
                   {/* Activity Radio Groups */}
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 dark:text-rose-400 block mb-2 font-montserrat">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 block mb-2 font-montserrat">
                       Чем займемся?
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       {customActivities.map((activityName) => (
-                        <div
+                        <button
+                          type="button"
                           key={activityName}
                           onClick={() => setSelectedActivity(activityName)}
-                          className={`cursor-pointer rounded-xl p-3.5 border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
+                          className={`cursor-pointer rounded-xl p-3 sm:p-3.5 border flex flex-col items-center justify-center gap-2 transition-all duration-300 min-h-20 ${
                             selectedActivity === activityName
-                              ? "border-rose-400 bg-rose-100/30 dark:border-rose-500 dark:bg-rose-950/20 font-medium scale-98 shadow-sm"
-                              : "border-zinc-200 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-rose-800 bg-white/30 dark:bg-zinc-950/10"
+                              ? "border-rose-400 bg-rose-100/40 font-medium scale-98 shadow-sm"
+                              : "border-zinc-200 hover:border-rose-300 bg-white/35"
                           }`}
                         >
                           {getIconForActivity(activityName)}
-                          <span className="text-xs sm:text-sm font-medium text-center">{activityName}</span>
-                        </div>
+                          <span className="text-xs sm:text-sm font-medium text-center text-zinc-700">{activityName}</span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -517,35 +516,38 @@ export default function InvitationModal({
                   {/* Date & Time Picker */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label htmlFor="date-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 dark:text-rose-400 block mb-1.5 font-montserrat">
-                        Какая дата?
+                      <label htmlFor="date-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 block mb-1.5 font-montserrat">
+                        {allowDateSelection ? "Какая дата?" : "Дата"}
                       </label>
                       <input
                           id="date-input"
                           type="date"
-                          value="2026-06-22" // Фиксированная дата, которую ты просил
-                          readOnly // Запрещает изменение, но сохраняет фокус/стили активного элемента
-                          className="w-full rounded-xl px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm focus:outline-none cursor-not-allowed pointer-events-none"
+                          value={date}
+                          onChange={(e) => setDate(e.target.value)}
+                          required
+                          readOnly={!allowDateSelection}
+                          className={`w-full rounded-xl px-3 py-2.5 border border-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-rose-400 ${allowDateSelection ? "bg-white/60 text-zinc-800" : "bg-zinc-50/70 text-zinc-500 cursor-not-allowed"}`}
                         />
                     </div>
                     <div>
-                      <label htmlFor="time-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 dark:text-rose-400 block mb-1.5 font-montserrat">
-                        Какое время?
+                      <label htmlFor="time-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 block mb-1.5 font-montserrat">
+                        {allowTimeSelection ? "Какое время?" : "Время"}
                       </label>
                       <input
                         id="time-input"
                         type="time"
                         value={time}
                         onChange={(e) => setTime(e.target.value)}
-                        disabled={!allowTimeSelection}
-                        className="w-full rounded-xl px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-950/30 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-rose-400"
+                        required
+                        readOnly={!allowTimeSelection}
+                        className={`w-full rounded-xl px-3 py-2.5 border border-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-rose-400 ${allowTimeSelection ? "bg-white/60 text-zinc-800" : "bg-zinc-50/70 text-zinc-500 cursor-not-allowed"}`}
                       />
                     </div>
                   </div>
 
                   {/* Comment preferences */}
                   <div>
-                    <label htmlFor="comment-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 dark:text-rose-400 block mb-1.5 font-montserrat">
+                    <label htmlFor="comment-input" className="text-xs font-semibold uppercase tracking-wider text-rose-500/80 block mb-1.5 font-montserrat">
                       Твои пожелания 
                     </label>
                     <textarea
@@ -554,7 +556,7 @@ export default function InvitationModal({
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Например: хочу выпить кофе..."
                       rows={2}
-                      className="w-full rounded-xl px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-950/30 text-zinc-800 dark:text-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-rose-400 resize-none"
+                      className="w-full rounded-xl px-3 py-2.5 border border-zinc-200 bg-white/60 text-zinc-800 text-xs sm:text-sm focus:outline-none focus:border-rose-400 resize-none"
                     />
                   </div>
                 </div>
@@ -574,41 +576,41 @@ export default function InvitationModal({
               /* Phase 3: Final confirmation page */
               <div className="flex flex-col items-center py-6">
                 {/* Flying hearts SVG */}
-                <div className="w-20 h-20 rounded-full bg-rose-100 dark:bg-rose-950/30 flex items-center justify-center mb-6 animate-bounce">
+                <div className="w-20 h-20 rounded-full bg-rose-100 flex items-center justify-center mb-6 animate-bounce">
                   <svg className="w-10 h-10 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl font-serif text-zinc-900 dark:text-pink-50 mb-3 leading-snug">
+                <h2 className="text-2xl sm:text-3xl font-serif text-zinc-900 mb-3 leading-snug">
                   План сохранен!
                 </h2>
 
-                <div className="glass-card rounded-2xl p-5 text-left w-full mb-6 text-zinc-700 dark:text-zinc-300 text-sm font-montserrat flex flex-col gap-2">
-                  <div className="flex justify-between border-b border-rose-100 dark:border-rose-950/30 pb-2">
-                    <span className="font-semibold text-rose-500/80 dark:text-rose-400">Формат:</span>
+                <div className="glass-card rounded-2xl p-5 text-left w-full mb-6 text-zinc-700 text-sm font-montserrat flex flex-col gap-2">
+                  <div className="flex justify-between border-b border-rose-100 pb-2 gap-4">
+                    <span className="font-semibold text-rose-500/80">Формат:</span>
                     <span className="font-medium">{selectedActivity}</span>
                   </div>
-                  <div className="flex justify-between border-b border-rose-100 dark:border-rose-950/30 pb-2">
-                    <span className="font-semibold text-rose-500/80 dark:text-rose-400">Дата:</span>
-                    <span>{new Date(date).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</span>
+                  <div className="flex justify-between border-b border-rose-100 pb-2 gap-4">
+                    <span className="font-semibold text-rose-500/80">Дата:</span>
+                    <span>{date ? new Date(date).toLocaleDateString("ru-RU", { day: "numeric", month: "long" }) : "не выбрана"}</span>
                   </div>
-                  <div className="flex justify-between border-b border-rose-100 dark:border-rose-950/30 pb-2">
-                    <span className="font-semibold text-rose-500/80 dark:text-rose-400">Время:</span>
-                    <span>{time}</span>
+                  <div className="flex justify-between border-b border-rose-100 pb-2 gap-4">
+                    <span className="font-semibold text-rose-500/80">Время:</span>
+                    <span>{time || "не выбрано"}</span>
                   </div>
                   {message.trim() && (
                     <div className="pt-1 flex flex-col gap-1">
-                      <span className="font-semibold text-rose-500/80 dark:text-rose-400">Твои пожелания:</span>
-                      <span className="italic text-zinc-500 dark:text-zinc-400 block whitespace-pre-wrap">
+                      <span className="font-semibold text-rose-500/80">Твои пожелания:</span>
+                      <span className="italic text-zinc-500 block whitespace-pre-wrap">
                         &ldquo;{message}&rdquo;
                       </span>
                     </div>
                   )}
                 </div>
 
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm mb-4 font-light">
-                  Вот такой формат мне нравится и нету никаких "посмотрим" или "напишу если что".
+                <p className="text-sm text-zinc-600 max-w-sm mb-4 font-light">
+                  Ответ отправлен автору приглашения в Telegram. Осталось только встретиться.
                 </p>
 
                 <div className="text-xs text-rose-400/80 font-handwritten text-xl tracking-wide mt-2">

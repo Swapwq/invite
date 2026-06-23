@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readDb } from "@/lib/db";
+import { Invitation, readDb } from "@/lib/db";
 
 /**
  * POST /api/invitations/accept
@@ -11,14 +11,14 @@ export async function POST(request: Request) {
     const { id, creatorChatId, activity, date, time, message, notifyChatId } = await request.json();
 
     const invitations = await readDb();
-    let invitation: any = undefined;
+    let invitation: Invitation | undefined = undefined;
 
     if (id) {
       invitation = invitations[id];
     } else if (creatorChatId) {
       // Find first pending invitation created by this chat ID
       invitation = Object.values(invitations).find(
-        (inv: any) => inv.creatorChatId === String(creatorChatId) && inv.status === "pending"
+        (inv) => inv.creatorChatId === String(creatorChatId) && inv.status === "pending"
       );
     }
 
@@ -81,7 +81,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, invitation });
-  } catch (error: any) {
-    return NextResponse.json({ error: "Failed to accept invitation", details: error.message }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: "Failed to accept invitation", details: message }, { status: 500 });
   }
 }
