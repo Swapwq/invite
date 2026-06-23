@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { createClient } from "@supabase/supabase-js";
 
 export interface Invitation {
   id: string;
@@ -24,7 +25,38 @@ export interface Invitation {
 
 const DB_PATH = path.join(process.cwd(), "data", "db.json");
 
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = supabaseUrl && supabaseServiceRoleKey
+  ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    })
+  : null;
+
+type InvitationRow = {
+  id: string;
+  invitation: Invitation;
+};
+
 export async function readDb(): Promise<Record<string, Invitation>> {
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("invitations")
+      .select("id, invitation");
+
+    if (error) {
+      throw error;
+    }
+
+    return (data as InvitationRow[]).reduce<Record<string, Invitation>>((acc, row) => {
+      acc[row.id] = row.invitation;
+      return acc;
+    }, {});
+  }
+
   try {
     const data = await fs.readFile(DB_PATH, "utf-8");
     const parsed = JSON.parse(data);
@@ -36,6 +68,24 @@ export async function readDb(): Promise<Record<string, Invitation>> {
 }
 
 export async function writeDb(invitations: Record<string, Invitation>): Promise<void> {
+  if (supabase) {
+    const invitation = Object.values(invitations).at(-1);
+
+    if (!invitation) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("invitations")
+      .upsert({ id: invitation.id, invitation }, { onConflict: "id" });
+
+    if (error) {
+      throw error;
+    }
+
+    return;
+  }
+
   const dir = path.dirname(DB_PATH);
   // Ensure the directory exists
   await fs.mkdir(dir, { recursive: true });

@@ -209,7 +209,14 @@ async function createInvitation(chatId, session) {
         })
       });
       if (!response.ok) {
-        throw new Error(`API responded with ${response.status}`);
+        let details = "";
+        try {
+          const errorBody = await response.json();
+          details = errorBody.details || errorBody.error || JSON.stringify(errorBody);
+        } catch {
+          details = await response.text();
+        }
+        throw new Error(`API responded with ${response.status}${details ? `: ${details}` : ""}`);
       }
       const data = await response.json();
       const inviteUrl = `${baseUrl}/invite/${data.invitation.id}`;
@@ -221,7 +228,7 @@ async function createInvitation(chatId, session) {
     } catch (err) {
       console.error("API error:", err.message);
       await sendMessage(chatId,
-        "❌ Не удалось подключиться к серверу сайта.\n\nУбедись, что твой Next.js сервер запущен локально (выполнена команда <code>npm run dev</code>)."
+        `❌ Не удалось создать приглашение через сайт.\n\n<code>${err.message}</code>\n\nЕсли сайт на Vercel, проверь переменные SUPABASE_URL и SUPABASE_SERVICE_ROLE_KEY, таблицу invitations и сделай Redeploy.`
       );
     }
 }
