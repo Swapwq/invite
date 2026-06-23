@@ -31,8 +31,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Приглашение для Дарины",
-  description: "Особенное приглашение",
+  title: "Приглашение на свидание",
+  description: "Особенное приглашение для особенного человека.",
 };
 
 export const viewport: Viewport = {

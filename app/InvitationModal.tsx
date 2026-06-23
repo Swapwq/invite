@@ -411,20 +411,10 @@ export default function InvitationModal({
               Персональное приглашение
             </span>
 
-            <span className="mb-3 inline-flex rounded-full bg-white/60 px-4 py-1.5 text-sm font-semibold text-rose-600 shadow-sm ring-1 ring-rose-100">
-              Для {targetName}
-            </span>
-
             {/* Title Section */}
-          {customTitle ? (
             <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 leading-tight mb-4 tracking-tight">
-              {customTitle}
+              {targetName}, {customTitle || "пойдём на свидание?"}
             </h1>
-          ) : (
-            <h1 className="text-3xl sm:text-4xl font-serif text-zinc-900 leading-tight mb-4 tracking-tight">
-              {targetName}, пойдём на свидание?
-            </h1>
-          )}
           {customDescription && (
             <p className="text-sm sm:text-base text-zinc-600 font-montserrat font-light leading-relaxed max-w-xs mb-8">
               {customDescription}
